@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <style type="text/css">
+  body {
+    background-color: beige;
+  }
+  .link-container {
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+  }
+  .link-container a {
+    font-size: 2em;
+    color: black;
+    text-decoration: none;
+    border: 1px solid red;
+    border-radius: 30%;
+    padding: 10px;
+  }
+  .link-container a:first-child {
+    margin-right: 20px;
+  }
+ </style>
+</head>
+<body>
+  <form id="CharForm">
+    <label for="CharName">Star wars charapter</label>
+    <input type="text" placeholder="Search charapter" id="peopleName">
+  </form>
+  <div class="card-container">
+  </div>
+    <div class="link-container">
+      <a href="#" id="previous">Previous</a>
+      <a href="#" id="next">Next</a>
+   </div>
+ <script>
+  let allCharacters = [];
+
+  const $card_container = document.querySelector('.card-container');
+  const $prev = document.getElementById('previous');
+  const $next = document.getElementById('next');
+
+  const createCharacter = (character) => {
+    const $div = document.createElement('div');
+    $div.classList.add('card');
+    $div.dataset.id = character.id;
+
+    const $heading = document.createElement('h2');
+    $heading.classList.add('name');
+    $heading.textContent = character.name;
+
+    $div.append($heading);
+    console.log($div)
+
+    return $div;
+  }
+
+  const addCharacter = (array) => {
+   array.forEach(characterObject => {
+    const $characterDiv = createCharacter(characterObject)
+    $card_container.append( $characterDiv )
+   })
+  }
+
+  const getCharacter = (url) => {
+   const request = fetch(url, {
+    method: 'GET'
+   });
+   request
+    .then(res => res.json())
+    .then(res => {
+     console.log(res);
+     if (res.next) {
+      $next.hidden = false;
+      $next.href = res.next
+     } else {
+      $next.hidden = true;
+     }
+     if (res.previous) {
+      $prev.hidden = false;
+      $prev.href = res.previous;
+     } else {
+      $prev.hidden = true
+     }
+
+     const characters = res.results;
+     allCharacters = res.results;
+     console.log(characters);
+
+     addCharacter(characters)
+    })
+  }
+  getCharacter('https://swapi.dev/api/people');
+
+  const getOtherCharacters = (event) => {
+   event.preventDefault();
+
+   $card_container.innerHTML = '';
+   getCharacter(event.target.href);
+  }
+  $next.addEventListener('click', getOtherCharacters);
+  $prev.addEventListener('click', getOtherCharacters);
+ </script>
+</body>
+</html>
